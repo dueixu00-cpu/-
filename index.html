@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ 나를 디즈니 캐릭터로</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nanum Gothic', sans-serif;
+  background: linear-gradient(160deg, #e8f4ff 0%, #f9e8ff 50%, #fff0f5 100%);
+  min-height: 100vh;
+  color: #2a1a3e;
+  padding-bottom: 60px;
+}
+
+.wrap { max-width: 600px; margin: 0 auto; padding: 32px 20px; }
+
+header { text-align: center; margin-bottom: 32px; }
+header .icon { font-size: 52px; display: block; margin-bottom: 8px; }
+header h1 {
+  font-size: 26px; font-weight: 800; margin-bottom: 8px;
+  background: linear-gradient(135deg, #b08dde, #f4829a, #f7c948);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+header p { font-size: 13px; color: #7a6a8a; line-height: 1.7; }
+
+.card {
+  background: white; border-radius: 24px; padding: 24px;
+  box-shadow: 0 8px 32px rgba(176,141,222,0.15);
+  margin-bottom: 16px; border: 1.5px solid rgba(176,141,222,0.2);
+}
+.card-dark {
+  background: linear-gradient(135deg, #2a1a3e, #3d2a5a);
+  border: none;
+}
+.card-title {
+  font-size: 12px; font-weight: 800; color: #b08dde;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px;
+}
+
+/* Base prompt */
+.base-prompt-text { font-size: 12px; color: #e0d0ff; line-height: 1.7; font-style: italic; }
+.base-prompt-sub { font-size: 11px; color: #9a8aaa; margin-top: 8px; }
+
+/* Upload */
+.upload-zone {
+  border: 2.5px dashed rgba(176,141,222,0.45);
+  border-radius: 18px; padding: 36px 20px;
+  text-align: center; cursor: pointer;
+  background: linear-gradient(135deg, rgba(176,141,222,0.05), rgba(244,130,154,0.04));
+  transition: all 0.2s;
+}
+.upload-zone:hover { border-color: #b08dde; background: rgba(176,141,222,0.1); }
+.upload-zone .upload-icon { font-size: 44px; display: block; margin-bottom: 10px; }
+.upload-zone .upload-text { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.upload-zone .upload-sub { font-size: 12px; color: #9a8aaa; }
+
+#preview-wrap { text-align: center; margin-top: 16px; display: none; }
+#preview-img {
+  width: 110px; height: 110px; object-fit: cover;
+  border-radius: 50%; border: 3px solid #b08dde;
+  box-shadow: 0 4px 16px rgba(176,141,222,0.3);
+}
+#preview-label { font-size: 12px; color: #b08dde; font-weight: 700; margin-top: 8px; }
+
+/* Options grid */
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.opt-label { font-size: 12px; font-weight: 700; color: #7a6a8a; margin-bottom: 6px; }
+select {
+  width: 100%; padding: 10px 14px; border-radius: 12px;
+  border: 1.5px solid rgba(176,141,222,0.4); font-size: 13px;
+  font-family: inherit; background: white; color: #2a1a3e; cursor: pointer;
+}
+select:disabled { background: #f5f5f5; color: #aaa; cursor: default; }
+
+/* Button */
+#btn-gen {
+  width: 100%; padding: 18px;
+  background: linear-gradient(135deg, #b08dde, #f4829a);
+  color: white; border: none; border-radius: 18px;
+  font-size: 16px; font-weight: 800; cursor: pointer;
+  box-shadow: 0 6px 20px rgba(176,141,222,0.35);
+  margin-bottom: 20px; font-family: inherit;
+  transition: all 0.2s;
+}
+#btn-gen:hover { transform: translateY(-2px); }
+#btn-gen:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+/* Result */
+#result-card { display: none; border-color: rgba(247,201,72,0.4) !important; }
+.result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.result-header span { font-size: 16px; font-weight: 800; }
+.result-badge {
+  background: linear-gradient(135deg, #f7c948, #f4829a);
+  color: white; font-size: 11px; font-weight: 800;
+  padding: 3px 10px; border-radius: 20px;
+}
+.prompt-label {
+  font-size: 11px; font-weight: 800; color: #7a6a8a;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;
+}
+.prompt-box {
+  background: #f8f4ff; border: 1.5px solid rgba(176,141,222,0.25);
+  border-radius: 14px; padding: 16px; font-size: 13px;
+  line-height: 1.8; color: #3a2a5a;
+  white-space: pre-wrap; word-break: break-word; margin-bottom: 16px;
+}
+.action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-copy {
+  padding: 13px; background: linear-gradient(135deg, #b08dde, #8b6ab8);
+  color: white; border: none; border-radius: 14px;
+  font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.btn-chatgpt {
+  padding: 13px; background: linear-gradient(135deg, #19a37a, #0d7a5a);
+  color: white; border-radius: 14px; font-size: 14px; font-weight: 700;
+  text-decoration: none; display: flex; align-items: center; justify-content: center;
+}
+
+/* How to */
+.howto {
+  background: linear-gradient(135deg, rgba(176,141,222,0.08), rgba(244,130,154,0.06));
+  border-radius: 20px; padding: 24px; border: 1.5px solid rgba(176,141,222,0.15);
+}
+.howto-title {
+  font-size: 12px; font-weight: 800; color: #b08dde;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px;
+}
+.step { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.step-num {
+  width: 26px; height: 26px; min-width: 26px;
+  background: linear-gradient(135deg, #b08dde, #f4829a);
+  color: white; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+}
+.step-text { font-size: 13px; line-height: 1.6; color: #4a3a6a; padding-top: 3px; }
+
+footer { text-align: center; margin-top: 28px; font-size: 12px; color: #9a8aaa; }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: #2a1a3e; color: white; padding: 12px 24px;
+  border-radius: 30px; font-size: 14px; font-weight: 700;
+  z-index: 100; white-space: nowrap; transition: transform 0.3s ease;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 480px) {
+  .options-grid { grid-template-columns: 1fr; }
+  .action-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="icon">🪄</span>
+    <h1>나를 디즈니 캐릭터로</h1>
+    <p>사진을 올리면 픽사 스타일 캐릭터 프롬프트를 만들어드려요<br>ChatGPT / Gemini에 붙여넣으면 바로 완성! ✨</p>
+  </header>
+
+  <!-- 공식 베이스 프롬프트 -->
+  <div class="card card-dark">
+    <div class="card-title" style="color:#b08dde;">✨ 공식 베이스 프롬프트</div>
+    <div class="base-prompt-text">3D Disney Pixar style, vibrant colors, 8k resolution, highly detailed, cute and charming, cinematic lighting, rendered in Unreal Engine, Disney Animation Studio</div>
+    <div class="base-prompt-sub">+ 사진 속 인물 특징이 자동으로 추가됩니다</div>
+  </div>
+
+  <!-- 업로드 -->
+  <div class="card">
+    <div class="card-title">📸 사진 업로드</div>
+    <label for="file-input" class="upload-zone" id="upload-zone">
+      <span class="upload-icon">🖼️</span>
+      <div class="upload-text">여기를 눌러 사진을 올려주세요</div>
+      <div class="upload-sub">셀카, 커플사진, 단체사진 모두 OK</div>
+    </label>
+    <input type="file" id="file-input" accept="image/*" style="display:none">
+    <div id="preview-wrap">
+      <img id="preview-img" src="" alt="미리보기">
+      <div id="preview-label">✅ 사진 준비 완료!</div>
+    </div>
+  </div>
+
+  <!-- 스타일 설정 -->
+  <div class="card">
+    <div class="card-title">🎨 스타일 설정</div>
+    <div class="options-grid">
+      <div>
+        <div class="opt-label">인원</div>
+        <select id="opt-count">
+          <option value="single person">혼자 (1명)</option>
+          <option value="couple, two people" selected>커플 (2명)</option>
+          <option value="group of three people">그룹 (3명+)</option>
+        </select>
+      </div>
+      <div>
+        <div class="opt-label">분위기</div>
+        <select id="opt-mood">
+          <option value="cute and bubbly">귀엽고 발랄한 💕</option>
+          <option value="romantic and sweet">로맨틱한 🌹</option>
+          <option value="joyful and playful" selected>장난스럽고 유쾌한 😄</option>
+          <option value="elegant and graceful">우아하고 고급스러운 👑</option>
+        </select>
+      </div>
+      <div>
+        <div class="opt-label">배경</div>
+        <select id="opt-bg">
+          <option value="magical castle with golden light">마법의 성 앞 🏰</option>
+          <option value="blooming flower field with soft sunlight">꽃밭 🌸</option>
+          <option value="starry night sky with magic sparkles" selected>별빛 밤하늘 ✨</option>
+          <option value="beautiful sunset beach with warm colors">바닷가 석양 🌅</option>
+          <option value="enchanted forest with glowing fireflies">마법 숲속 🌿</option>
+        </select>
+      </div>
+      <div>
+        <div class="opt-label">스타일</div>
+        <select disabled>
+          <option>픽사 3D 스타일 ✨</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 버튼 -->
+  <button id="btn-gen" onclick="generatePrompt()">✨ 디즈니 캐릭터 프롬프트 만들기</button>
+
+  <!-- 결과 -->
+  <div class="card" id="result-card">
+    <div class="result-header">
+      <span>🎉 프롬프트 완성!</span>
+      <span class="result-badge">READY TO USE</span>
+    </div>
+    <div class="prompt-label">🇺🇸 완성된 영어 프롬프트</div>
+    <div class="prompt-box" id="prompt-en"></div>
+    <div class="prompt-label">🇰🇷 반영된 특징 설명</div>
+    <div class="prompt-box" id="prompt-ko"></div>
+    <div class="action-row">
+      <button class="btn-copy" onclick="copyPrompt()">📋 프롬프트 복사</button>
+      <a class="btn-chatgpt" href="https://chat.openai.com" target="_blank">🤖 ChatGPT 열기</a>
+    </div>
+  </div>
+
+  <!-- 사용법 -->
+  <div class="howto">
+    <div class="howto-title">✨ 이렇게 사용하세요</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text">사진을 올리고 스타일을 설정하세요</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text">프롬프트 만들기 버튼을 누르세요</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text">완성된 프롬프트를 복사하세요</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text">ChatGPT 또는 Gemini에 붙여넣기하면 완성! 🎉</div></div>
+  </div>
+
+  <footer>마음에 드셨다면 팔로우해주세요 💜</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const BASE_PROMPT = "3D Disney Pixar style, vibrant colors, 8k resolution, highly detailed, cute and charming, cinematic lighting, rendered in Unreal Engine, Disney Animation Studio";
+let imageBase64 = null;
+
+// 파일 업로드
+document.getElementById('file-input').addEventListener('change', function(e) {
+  handleFile(e.target.files[0]);
+});
+
+// 드래그앤드롭
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => e.preventDefault());
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  handleFile(e.dataTransfer.files[0]);
+});
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imageBase64 = e.target.result.split(',')[1];
+    document.getElementById('preview-img').src = e.target.result;
+    document.getElementById('preview-wrap').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function generatePrompt() {
+  if (!imageBase64) { showToast('📸 먼저 사진을 올려주세요!'); return; }
+
+  const count = document.getElementById('opt-count').value;
+  const mood  = document.getElementById('opt-mood').value;
+  const bg    = document.getElementById('opt-bg').value;
+
+  const btn = document.getElementById('btn-gen');
+  btn.disabled = true;
+  btn.textContent = '✨ 마법을 걸고 있어요...';
+  document.getElementById('result-card').style.display = 'none';
+
+  const systemPrompt = `You are an expert at analyzing photos and creating highly detailed Disney Pixar character image generation prompts.
+
+Analyze the photo carefully and extract:
+- Number of people and their gender
+- Hair color, hair length, hair style (straight/wavy/curly)
+- Eye color and eye shape
+- Face shape (round/oval/heart/square)
+- Skin tone
+- Any distinctive features (freckles, dimples, glasses, etc.)
+- Clothing style and colors if visible
+
+Then create a prompt starting with this EXACT base:
+"${BASE_PROMPT}"
+
+Add after the base: detailed character description based on photo features, mood, and background setting. Keep it natural and flowing as one complete prompt.
+
+Respond ONLY in this JSON format (no markdown, no backticks):
+{"en":"full english prompt here","ko":"한국어로 어떤 특징을 반영했는지 설명"}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
+            { type: 'text', text: `사진을 분석해서 디즈니 픽사 캐릭터 프롬프트를 만들어주세요.\n인원: ${count}\n분위기: ${mood}\n배경: ${bg}\n\n반드시 사진 속 외모 특징(머리색, 눈색, 얼굴형, 피부톤 등)을 구체적으로 포함해주세요.` }
+          ]
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content.map(i => i.text || '').join('');
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+
+    document.getElementById('prompt-en').textContent = parsed.en;
+    document.getElementById('prompt-ko').textContent = parsed.ko;
+    document.getElementById('result-card').style.display = 'block';
+    document.getElementById('result-card').scrollIntoView({ behavior: 'smooth' });
+
+  } catch(err) {
+    showToast('오류가 발생했어요. 다시 시도해주세요 😢');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ 디즈니 캐릭터 프롬프트 만들기';
+  }
+}
+
+function copyPrompt() {
+  const text = document.getElementById('prompt-en').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('✅ 복사 완료! ChatGPT에 붙여넣으세요'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
